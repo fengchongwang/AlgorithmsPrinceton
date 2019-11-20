@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class WeightedQuickUnionPathCompression {
     private int[] paths;
     private int size;    // total number of nodes
