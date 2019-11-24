@@ -1,3 +1,5 @@
+import java.lang.IllegalArgumentException;
+
 public class WeightedQuickUnionPathCompression {
     private int[] paths;
     private int nNodes;    // total number of nodes
@@ -32,7 +34,7 @@ public class WeightedQuickUnionPathCompression {
         if (rootP == rootQ) {
             return; // Do nothing if p and q have been already connected.
         }
-        if (iSize[rootP] < iSize[rootQ]) {
+        if (iSize[rootQ] < iSize[rootP]) {
             paths[rootQ] = rootP;
             iSize[rootP] += iSize[rootQ];
         } else {

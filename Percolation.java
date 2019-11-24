@@ -1,9 +1,10 @@
+import java.lang.IllegalArgumentException;
+
 public class Percolation {
-    private final boolean[][] grid;
+    private final byte[] grid;
     private final int width;
     private final WeightedQuickUnionPathCompression connectionMap;
     private final int topIdx;
-    private final int bottomIdx;
     private int numOpenSites;
 
     // creates n-by-n grid, with all sites initially blocked
@@ -14,14 +15,10 @@ public class Percolation {
         numOpenSites = 0;
         width = n;
         topIdx = n * n;
-        bottomIdx = n * n + 1;
-        grid = new boolean[n][n];
-        connectionMap = new WeightedQuickUnionPathCompression(n * n + 2);
+        grid = new byte[n * n + 1];
+        connectionMap = new WeightedQuickUnionPathCompression(n * n + 1);
         for (int i = 0; i < n; i++) {
             connectionMap.union(i, topIdx);
-        }
-        for (int i = n * (n - 1); i < n * n; i++) {
-            connectionMap.union(i, bottomIdx);
         }
     }
 
@@ -32,25 +29,29 @@ public class Percolation {
         if (isOpen(row, col)) {
             return;
         }
-        grid[row - 1][col - 1] = true;
         final int idxCur = getIndex(row, col);
+        grid[idxCur] = getOpenValue(row);      
         if (row - 1 > 0) {
             if (isOpen(row - 1, col)) {
+                updateGridValues(grid, idxCur, idxCur - width);
                 connectionMap.union(idxCur, idxCur - width);
             }
         }
         if (col - 1 > 0) {
             if (isOpen(row, col - 1)) {
+                updateGridValues(grid, idxCur, idxCur - 1);
                 connectionMap.union(idxCur, idxCur - 1);
             }
         }
         if (row + 1 <= width) {
             if (isOpen(row + 1, col)) {
+                updateGridValues(grid, idxCur, idxCur + width);
                 connectionMap.union(idxCur, idxCur + width);
             }
         }
         if (col + 1 <= width) {
             if (isOpen(row, col + 1)) {
+                updateGridValues(grid, idxCur, idxCur + 1);
                 connectionMap.union(idxCur, idxCur + 1);
             }
         }
@@ -61,7 +62,38 @@ public class Percolation {
     public boolean isOpen(final int row, final int col) {
         checkInput(row);
         checkInput(col);
-        return grid[row - 1][col - 1];
+        return (grid[getIndex(row, col)] > 0);
+    }
+
+    private byte getOpenValue(final int row) {
+        if (row < width) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    private void updateGridValues(byte[] arr, final int idx0, final int idx1) {
+        final int idxRoot0 = connectionMap.find(idx0);
+        final int idxRoot1 = connectionMap.find(idx1);
+        if ((arr[idxRoot0] == 2) || (arr[idxRoot1] == 2)) {
+            arr[idxRoot0] = 2;
+            arr[idxRoot1] = 2;
+        } else {
+            arr[idxRoot0] = 1;
+            arr[idxRoot1] = 1;
+        }
+    }
+
+    public void printGrid() {
+        System.out.println(grid[grid.length-1]);
+        for (int i = 0; i < grid.length-1; i++) {
+            if((i+1) % width == 0) {
+                System.out.println(grid[i]);
+            } else {
+                System.out.print(grid[i] + "\t");
+            }
+        }
     }
 
     private int getIndex(final int row, final int col) {
@@ -81,7 +113,7 @@ public class Percolation {
         if (row == 1) { // Corner case
             return true;
         }
-        return connectionMap.connected(topIdx, getIndex(row, col));
+        return connectionMap.connected(getIndex(row, col), topIdx);
     }
 
     // returns the number of open sites
@@ -92,18 +124,19 @@ public class Percolation {
     // does the system percolate?
     public boolean percolates() {
         if (width == 1) { // Corner case
-            return isFull(1, 1);
+            return isOpen(1, 1);
         }
-        return connectionMap.connected(topIdx, bottomIdx);
+        return grid[connectionMap.find(topIdx)] == 2;
     }
 
     // test client (optional)
     public static void main(final String[] args) {
         Percolation p = new Percolation(3);
+        p.open(3, 1);
         p.open(1, 3);
         p.open(2, 3);
-        p.open(3, 3);
-        p.open(3, 1);
-        System.out.println(p.isFull(3, 1));
+        p.open(3, 3);        
+        System.out.println(p.percolates());
+        p.printGrid();
     }
 }

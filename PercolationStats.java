@@ -11,11 +11,12 @@
  ******************************************************************************/
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
+import java.lang.IllegalArgumentException;
 
 public class PercolationStats {
 	private double[] res;
 	private int numTrials;
-	private int size;
+	private int width;
 	
 	/**
 	 * Perform trials independent experiments on an n-by-n grid.
@@ -25,25 +26,25 @@ public class PercolationStats {
 	 */
 	public PercolationStats(int n, int trials) {
 		if (trials <= 0 || n <= 0) {
-			throw new java.lang.IllegalArgumentException();
+			throw new IllegalArgumentException();
 		}
 		Percolation pcl;
 		numTrials = trials;
-		size = n;
+		width = n;
 		int[] perm;
 		int rowIndex;
 		int colIndex;
 		res = new double[trials];
 		for (int i = 0; i < trials; i++) {
-			pcl = new Percolation(n);
-			perm = StdRandom.permutation(n*n);
+			pcl = new Percolation(width);
+			perm = StdRandom.permutation(width*width);
 			int j;
 			for (j = 0; !pcl.percolates(); j++) {
-				rowIndex = perm[j]/n;
-				colIndex = perm[j] % n;
-				pcl.open(rowIndex+1, colIndex+1);
+				rowIndex = (perm[j] + 1)/width + 1;
+				colIndex = perm[j] + 1 - (rowIndex - 1)*width;
+				pcl.open(rowIndex+1, colIndex);
 			}
-			res[i] = ((double) j)/size/size;
+			res[i] = ((double) j)/(width*width);
 		}		
 	}
 	
