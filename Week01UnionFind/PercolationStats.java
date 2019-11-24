@@ -14,9 +14,7 @@ import edu.princeton.cs.algs4.StdStats;
 import java.lang.IllegalArgumentException;
 
 public class PercolationStats {
-	private double[] res;
-	private int numTrials;
-	private int width;
+	private final double[] res;
 	
 	/**
 	 * Perform trials independent experiments on an n-by-n grid.
@@ -29,22 +27,20 @@ public class PercolationStats {
 			throw new IllegalArgumentException();
 		}
 		Percolation pcl;
-		numTrials = trials;
-		width = n;
 		int[] perm;
 		int rowIndex;
 		int colIndex;
 		res = new double[trials];
 		for (int i = 0; i < trials; i++) {
-			pcl = new Percolation(width);
-			perm = StdRandom.permutation(width*width);
+			pcl = new Percolation(n);
+			perm = StdRandom.permutation(n*n);
 			int j;
 			for (j = 0; !pcl.percolates(); j++) {
-				rowIndex = (perm[j] + 1)/width + 1;
-				colIndex = perm[j] + 1 - (rowIndex - 1)*width;
+				rowIndex = (perm[j] + 1)/n + 1;
+				colIndex = perm[j] + 1 - (rowIndex - 1)*n;
 				pcl.open(rowIndex+1, colIndex);
 			}
-			res[i] = ((double) j)/(width*width);
+			res[i] = ((double) j)/(n*n);
 		}		
 	}
 	
@@ -71,7 +67,7 @@ public class PercolationStats {
 	 * @return
 	 */
 	public double confidenceLo() {
-		return this.mean()-1.96*this.stddev()/Math.sqrt(numTrials);
+		return this.mean()-1.96*this.stddev()/Math.sqrt(res.length);
 	}
 	
 	/**
@@ -80,7 +76,7 @@ public class PercolationStats {
 	 * @return
 	 */
 	public double confidenceHi() {
-		return this.mean()+1.96*this.stddev()/Math.sqrt(numTrials);
+		return this.mean()+1.96*this.stddev()/Math.sqrt(res.length);
 	}
 
     public static void main(String[] args) {

@@ -101,7 +101,7 @@ public class Percolation {
     }
 
     private void checkInput(final int row) {
-        if (row <= 0 | row > width) {
+        if (row <= 0 || row > width) {
             throw new IllegalArgumentException();
         }
     }
@@ -143,7 +143,7 @@ public class Percolation {
 
 class WeightedQuickUnionPathCompression {
     private int[] paths;
-    private int nNodes;    // total number of nodes
+    private final int nNodes;    // total number of nodes
     private int[] iSize; // number of node of tree i
     private int numTree; // number of subtrees
     public WeightedQuickUnionPathCompression(final int n) {
@@ -188,7 +188,7 @@ class WeightedQuickUnionPathCompression {
         return numTree;
     }
     private void checkInput(final int p) {
-        if (p < 0 | p >= nNodes) {
+        if (p < 0 || p >= nNodes) {
             throw new IllegalArgumentException();
         }
     }
